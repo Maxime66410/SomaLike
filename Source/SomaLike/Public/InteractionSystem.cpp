@@ -3,10 +3,22 @@
 
 #include "InteractionSystem.h"
 
-InteractionSystem::InteractionSystem()
+void IInteractionSystem::OnInspect(ASomaLikeCharacter* Character)
 {
 }
 
-InteractionSystem::~InteractionSystem()
+void IInteractionSystem::OnInteract(ASomaLikeCharacter* Character)
+{
+}
+
+void IInteractionSystem::OnUse(ASomaLikeCharacter* Character)
+{
+}
+
+void IInteractionSystem::OnDrop(ASomaLikeCharacter* Character)
+{
+}
+
+void IInteractionSystem::OnEquip(ASomaLikeCharacter* Character)
 {
 }

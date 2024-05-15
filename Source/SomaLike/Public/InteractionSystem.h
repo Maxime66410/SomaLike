@@ -3,13 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "SomaLike/SomaLikeCharacter.h"
+#include "UObject/Interface.h"
+#include "InteractionSystem.generated.h"
 
-/**
- * 
- */
-class SOMALIKE_API InteractionSystem
+UINTERFACE(MinimalAPI, Blueprintable)
+class UInteractionSystem : public UInterface
 {
+	GENERATED_BODY()
+};
+
+class SOMALIKE_API IInteractionSystem
+{
+	GENERATED_BODY()
 public:
-	InteractionSystem();
-	~InteractionSystem();
+	
+	virtual void OnInspect(ASomaLikeCharacter* Character);
+
+	virtual void OnInteract(ASomaLikeCharacter* Character);
+
+	virtual void OnUse(ASomaLikeCharacter* Character);
+
+	virtual void OnDrop(ASomaLikeCharacter* Character);
+
+	virtual void OnEquip(ASomaLikeCharacter* Character);
 };

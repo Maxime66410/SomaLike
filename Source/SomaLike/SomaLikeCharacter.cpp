@@ -9,6 +9,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "InteractionSystem.h"
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -39,6 +40,9 @@ ASomaLikeCharacter::ASomaLikeCharacter()
 	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
+
+	// Interaction System
+	PhysicsHandle = CreateDefaultSubobject<UPhysicsHandleComponent>(TEXT("PhysicsHandle"));
 }
 
 void ASomaLikeCharacter::BeginPlay()
@@ -73,6 +77,13 @@ void ASomaLikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ASomaLikeCharacter::Look);
+
+		// Interacting
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ASomaLikeCharacter::StartInteract);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ASomaLikeCharacter::TriggeredInteract);
+
+		// Dropping
+		EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Started, this, &ASomaLikeCharacter::Drop);
 	}
 	else
 	{
@@ -107,6 +118,75 @@ void ASomaLikeCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
+void ASomaLikeCharacter::StartInteract(const FInputActionValue& Value)
+{
+	if(!bIsInteracting && !GetInteractable())
+	{
+		// Line trace to interact with objects
+		FVector Start = FirstPersonCameraComponent->GetComponentLocation();
+		FVector End = Start + FirstPersonCameraComponent->GetForwardVector() * 1000.f;
+		FHitResult Hit;
+		FCollisionQueryParams TraceParams;
+		TraceParams.AddIgnoredActor(this);
+		GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECollisionChannel::ECC_Visibility, TraceParams);
+		if (Hit.bBlockingHit)
+		{
+			if(IInteractionSystem* Interface = Cast<IInteractionSystem>(Hit.GetActor()))
+			{
+				Interface->OnInteract(this);
+				Interface->OnEquip(this);
+				Interface->OnInspect(this);
+				Interface->OnUse(this);
+			}
+		}
+	}
+	else
+	{
+		if(PhysicsHandle->GrabbedComponent)
+		{
+			Drop(Value);
+		}
+	}
+}
+
+void ASomaLikeCharacter::TriggeredInteract(const FInputActionValue& Value)
+{
+	if(bIsInteracting && GetInteractable())
+	{
+		
+	}
+}
+
+
+void ASomaLikeCharacter::Drop(const FInputActionValue& Value)
+{
+	if(bIsInteracting && GetInteractable())
+	{
+		if(IInteractionSystem* Interface = Cast<IInteractionSystem>(GetInteractable()))
+		{
+			Interface->OnDrop(this);
+		}
+	}
+}
+
+void ASomaLikeCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if(bIsInteracting && GetInteractable())
+	{
+		if(PhysicsHandle->GrabbedComponent)
+		{
+			FVector Start = Mesh1P->GetSocketLocation("head");
+			FVector End = Start + (FirstPersonCameraComponent->GetForwardVector() * 300.0f);
+			PhysicsHandle->SetTargetLocation(End);
+
+			// Set rotation of grabbed object to match the camera rotation
+			PhysicsHandle->SetTargetRotation(FirstPersonCameraComponent->GetComponentRotation());
+		}
+	}
+}
+
 void ASomaLikeCharacter::SetHasRifle(bool bNewHasRifle)
 {
 	bHasRifle = bNewHasRifle;
@@ -115,4 +195,29 @@ void ASomaLikeCharacter::SetHasRifle(bool bNewHasRifle)
 bool ASomaLikeCharacter::GetHasRifle()
 {
 	return bHasRifle;
+}
+
+void ASomaLikeCharacter::SetInteractable(AActor* Interactable)
+{
+	CurrentInteractable = Interactable;
+}
+
+AActor* ASomaLikeCharacter::GetInteractable()
+{
+	return CurrentInteractable;
+}
+
+void ASomaLikeCharacter::SetInteracting(bool bNewInteracting)
+{
+	bIsInteracting = bNewInteracting;
+}
+
+bool ASomaLikeCharacter::GetInteracting()
+{
+	return bIsInteracting;
+}
+
+UPhysicsHandleComponent* ASomaLikeCharacter::GetPhysicsHandle()
+{
+	return PhysicsHandle;
 }

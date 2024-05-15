@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "SomaLikeCharacter.generated.h"
 
 class UInputComponent;
@@ -40,6 +41,23 @@ class ASomaLikeCharacter : public ACharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
+
+	/** Interaction Ref **/
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* DropAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
+	AActor* CurrentInteractable;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
+	bool bIsInteracting = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
+	UPhysicsHandleComponent* PhysicsHandle;
 	
 public:
 	ASomaLikeCharacter();
@@ -65,12 +83,37 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Weapon)
 	bool GetHasRifle();
 
+	/* Interact Function */
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
+	void SetInteractable(AActor* Interactable);
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
+	AActor* GetInteractable();
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
+	void SetInteracting(bool bNewInteracting);
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
+	bool GetInteracting();
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
+	UPhysicsHandleComponent* GetPhysicsHandle();
+
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	void StartInteract(const FInputActionValue& Value);
+	
+	void TriggeredInteract(const FInputActionValue& Value);
+
+	void Drop(const FInputActionValue& Value);
+
+	virtual void Tick(float DeltaSeconds) override;
 
 protected:
 	// APawn interface
