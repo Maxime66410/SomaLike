@@ -34,6 +34,8 @@ public:
 
 	virtual void OnDrop(ASomaLikeCharacter* Character) override;
 
+	virtual void OnSwitchMode(ASomaLikeCharacter* Character) override;
+
 	UFUNCTION()
 	bool GetIsGrab() const { return bIsGrab; }
 

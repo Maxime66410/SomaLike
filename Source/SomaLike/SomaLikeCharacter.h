@@ -50,6 +50,9 @@ class ASomaLikeCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* DropAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* SwitchMode;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
 	AActor* CurrentInteractable;
 
@@ -58,6 +61,9 @@ class ASomaLikeCharacter : public ACharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
 	bool bIsInspect = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
+	bool bIsSwitchMode = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
 	UPhysicsHandleComponent* PhysicsHandle;
@@ -119,6 +125,12 @@ public:
 	bool GetInspect();
 
 	UFUNCTION(BlueprintCallable, Category = Interaction)
+	void SetSwitchMode(bool bNewSwitchMode);
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
+	bool GetSwitchMode();
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
 	UPhysicsHandleComponent* GetPhysicsHandle();
 
 	UFUNCTION(BlueprintCallable, Category = Move)
@@ -145,6 +157,8 @@ protected:
 	void TriggeredInteract(const FInputActionValue& Value);
 
 	void Drop(const FInputActionValue& Value);
+
+	void SwitchModeInteract(const FInputActionValue& Value);
 
 	virtual void Tick(float DeltaSeconds) override;
 

@@ -82,6 +82,9 @@ void ASomaLikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ASomaLikeCharacter::StartInteract);
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &ASomaLikeCharacter::TriggeredInteract);
 
+		// Switching Mode
+		EnhancedInputComponent->BindAction(SwitchMode, ETriggerEvent::Started, this, &ASomaLikeCharacter::SwitchModeInteract);
+
 		// Dropping
 		EnhancedInputComponent->BindAction(DropAction, ETriggerEvent::Started, this, &ASomaLikeCharacter::Drop);
 	}
@@ -176,6 +179,19 @@ void ASomaLikeCharacter::Drop(const FInputActionValue& Value)
 	}
 }
 
+void ASomaLikeCharacter::SwitchModeInteract(const FInputActionValue& Value)
+{
+	if(bIsInteracting | bIsInspect && GetInteractable())
+	{
+		SetSwitchMode(!GetSwitchMode());
+		
+		if(IInteractionSystem* Interface = Cast<IInteractionSystem>(GetInteractable()))
+		{
+			Interface->OnSwitchMode(this);
+		}
+	}
+}
+
 void ASomaLikeCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -254,6 +270,16 @@ void ASomaLikeCharacter::SetInspect(bool bNewInspect)
 bool ASomaLikeCharacter::GetInspect()
 {
 	return bIsInspect;
+}
+
+void ASomaLikeCharacter::SetSwitchMode(bool bNewSwitchMode)
+{
+	bIsSwitchMode = bNewSwitchMode;
+}
+
+bool ASomaLikeCharacter::GetSwitchMode()
+{
+	return bIsSwitchMode;
 }
 
 UPhysicsHandleComponent* ASomaLikeCharacter::GetPhysicsHandle()

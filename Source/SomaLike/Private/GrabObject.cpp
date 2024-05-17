@@ -53,9 +53,51 @@ void AGrabObject::OnDrop(ASomaLikeCharacter* Character)
 	SetIsGrab(false);
 
 	Character->SetInteracting(false);
+	Character->SetInspect(false);
+	Character->SetCanLook(true);
+	Character->SetCanMove(true);
+	Character->SetSwitchMode(false);
+	
+	MeshComponent->SetAngularDamping(0.0f);
 
 	Character->SetInteractable(nullptr);
 
 	Character->GetPhysicsHandle()->ReleaseComponent();
+}
+
+void AGrabObject::OnSwitchMode(ASomaLikeCharacter* Character)
+{
+	IInteractionSystem::OnSwitchMode(Character);
+
+	if(Character->GetSwitchMode())
+	{
+		Character->SetInteracting(false);
+		Character->SetInspect(true);
+		Character->SetCanLook(false);
+		Character->SetCanMove(false);
+
+		UPhysicsHandleComponent* PhysicsHandle = Character->GetPhysicsHandle();
+	
+		PhysicsHandle->GrabComponentAtLocation(MeshComponent, NAME_None, MeshComponent->GetComponentLocation());
+
+		MeshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
+		
+		MeshComponent->SetAngularDamping(100000.0f);
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("SSS"));
+		Character->SetInteracting(true);
+		Character->SetInspect(false);
+		Character->SetCanLook(true);
+		Character->SetCanMove(true);
+
+		MeshComponent->SetAngularDamping(0.0f);
+
+		UPhysicsHandleComponent* PhysicsHandle = Character->GetPhysicsHandle();
+	
+		PhysicsHandle->GrabComponentAtLocationWithRotation(MeshComponent, NAME_None, MeshComponent->GetComponentLocation(), MeshComponent->GetComponentRotation());
+	
+	}
 }
 

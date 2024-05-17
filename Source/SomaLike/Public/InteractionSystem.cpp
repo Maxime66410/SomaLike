@@ -22,3 +22,7 @@ void IInteractionSystem::OnDrop(ASomaLikeCharacter* Character)
 void IInteractionSystem::OnEquip(ASomaLikeCharacter* Character)
 {
 }
+
+void IInteractionSystem::OnSwitchMode(ASomaLikeCharacter* Character)
+{
+}

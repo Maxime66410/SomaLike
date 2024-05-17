@@ -27,4 +27,6 @@ public:
 	virtual void OnDrop(ASomaLikeCharacter* Character);
 
 	virtual void OnEquip(ASomaLikeCharacter* Character);
+
+	virtual void OnSwitchMode(ASomaLikeCharacter* Character);
 };
