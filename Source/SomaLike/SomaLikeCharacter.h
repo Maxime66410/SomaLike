@@ -57,7 +57,22 @@ class ASomaLikeCharacter : public ACharacter
 	bool bIsInteracting = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
+	bool bIsInspect = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
 	UPhysicsHandleComponent* PhysicsHandle;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
+	bool bCanMove = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
+	bool bCanLook = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
+	float LastMouseXPos;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
+	float LastMouseYPos;
 	
 public:
 	ASomaLikeCharacter();
@@ -98,8 +113,26 @@ public:
 	bool GetInteracting();
 
 	UFUNCTION(BlueprintCallable, Category = Interaction)
+	void SetInspect(bool bNewInspect);
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
+	bool GetInspect();
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
 	UPhysicsHandleComponent* GetPhysicsHandle();
 
+	UFUNCTION(BlueprintCallable, Category = Move)
+	void SetCanMove(bool bNewCanMove) { bCanMove = bNewCanMove; }
+
+	UFUNCTION(BlueprintCallable, Category = Move)
+	bool GetCanMove() const { return bCanMove; }
+
+	UFUNCTION(BlueprintCallable, Category = Move)
+	void SetCanLook(bool bNewCanLook) { bCanLook = bNewCanLook; }
+
+	UFUNCTION(BlueprintCallable, Category = Move)
+	bool GetCanLook() const { return bCanLook; }
+	
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -115,6 +148,8 @@ protected:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	void RotateObjectByMouse();
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -125,6 +160,5 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-
 };
 

@@ -99,6 +99,7 @@ void ASomaLikeCharacter::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
+		if (!bCanMove) return;
 		// add movement 
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
@@ -112,19 +113,24 @@ void ASomaLikeCharacter::Look(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
+		if (!bCanLook) return;
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+
+	// Get values from the mouse input and save for later
+	LastMouseXPos = LookAxisVector.X;
+	LastMouseYPos = LookAxisVector.Y;
 }
 
 void ASomaLikeCharacter::StartInteract(const FInputActionValue& Value)
 {
-	if(!bIsInteracting && !GetInteractable())
+	if(!bIsInteracting | !bIsInspect && !GetInteractable())
 	{
 		// Line trace to interact with objects
 		FVector Start = FirstPersonCameraComponent->GetComponentLocation();
-		FVector End = Start + FirstPersonCameraComponent->GetForwardVector() * 1000.f;
+		FVector End = Start + FirstPersonCameraComponent->GetForwardVector() * 200.f;
 		FHitResult Hit;
 		FCollisionQueryParams TraceParams;
 		TraceParams.AddIgnoredActor(this);
@@ -144,6 +150,7 @@ void ASomaLikeCharacter::StartInteract(const FInputActionValue& Value)
 	{
 		if(PhysicsHandle->GrabbedComponent)
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Dropping"));
 			Drop(Value);
 		}
 	}
@@ -160,7 +167,7 @@ void ASomaLikeCharacter::TriggeredInteract(const FInputActionValue& Value)
 
 void ASomaLikeCharacter::Drop(const FInputActionValue& Value)
 {
-	if(bIsInteracting && GetInteractable())
+	if(bIsInteracting | bIsInspect && GetInteractable())
 	{
 		if(IInteractionSystem* Interface = Cast<IInteractionSystem>(GetInteractable()))
 		{
@@ -173,17 +180,39 @@ void ASomaLikeCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if(bIsInteracting && GetInteractable())
+	if(bIsInteracting | bIsInspect && GetInteractable())
 	{
 		if(PhysicsHandle->GrabbedComponent)
 		{
+			float localDistance = bIsInspect ? 150.0f : 300.0f;
 			FVector Start = Mesh1P->GetSocketLocation("head");
-			FVector End = Start + (FirstPersonCameraComponent->GetForwardVector() * 300.0f);
+			FVector End = Start + (FirstPersonCameraComponent->GetForwardVector() * localDistance);
 			PhysicsHandle->SetTargetLocation(End);
 
 			// Set rotation of grabbed object to match the camera rotation
-			PhysicsHandle->SetTargetRotation(FirstPersonCameraComponent->GetComponentRotation());
+			if (!bIsInspect) PhysicsHandle->SetTargetRotation(FirstPersonCameraComponent->GetComponentRotation());
 		}
+		
+		if(bIsInspect)
+		{
+			RotateObjectByMouse();
+		}
+	}
+}
+
+void ASomaLikeCharacter::RotateObjectByMouse()
+{
+	if(bIsInspect && GetInteractable())
+	{
+		// Rotate object by mouse
+		float LocalMouseX = 0.f;
+		float LocalMouseY = 0.f;
+		GetWorld()->GetFirstPlayerController()->GetInputMouseDelta(LocalMouseX, LocalMouseY);
+		FRotator NewRotation = FRotator(0.f, LocalMouseX, LocalMouseY);
+
+		if(GetInteractable()->GetActorRotation() == NewRotation) return;
+		
+		GetInteractable()->AddActorLocalRotation(NewRotation);
 	}
 }
 
@@ -215,6 +244,16 @@ void ASomaLikeCharacter::SetInteracting(bool bNewInteracting)
 bool ASomaLikeCharacter::GetInteracting()
 {
 	return bIsInteracting;
+}
+
+void ASomaLikeCharacter::SetInspect(bool bNewInspect)
+{
+	bIsInspect = bNewInspect;
+}
+
+bool ASomaLikeCharacter::GetInspect()
+{
+	return bIsInspect;
 }
 
 UPhysicsHandleComponent* ASomaLikeCharacter::GetPhysicsHandle()
