@@ -36,16 +36,19 @@ void AGrabObject::Tick(float DeltaTime)
 void AGrabObject::OnInteract(ASomaLikeCharacter* Character)
 {
 	IInteractionSystem::OnInteract(Character);
-	
-	UPhysicsHandleComponent* PhysicsHandle = Character->GetPhysicsHandle();
-	
-	PhysicsHandle->GrabComponentAtLocationWithRotation(MeshComponent, NAME_None, MeshComponent->GetComponentLocation(), MeshComponent->GetComponentRotation());
-	
-	Character->SetInteracting(true);
 
-	SetIsGrab(true);
+	if(!GetIsGrab())
+	{
+		UPhysicsHandleComponent* PhysicsHandle = Character->GetPhysicsHandle();
+	
+		PhysicsHandle->GrabComponentAtLocationWithRotation(MeshComponent, NAME_None, MeshComponent->GetComponentLocation(), MeshComponent->GetComponentRotation());
+	
+		Character->SetInteracting(true);
 
-	Character->SetInteractable(this);
+		SetIsGrab(true);
+
+		Character->SetInteractable(this);
+	}
 }
 
 void AGrabObject::OnDrop(ASomaLikeCharacter* Character)

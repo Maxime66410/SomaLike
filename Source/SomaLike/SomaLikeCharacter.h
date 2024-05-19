@@ -63,6 +63,9 @@ class ASomaLikeCharacter : public ACharacter
 	bool bIsInspect = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
+	bool bIsInteract = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
 	bool bIsSwitchMode = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category =Interaction, meta = (AllowPrivateAccess = "true"))
@@ -125,6 +128,12 @@ public:
 	bool GetInspect();
 
 	UFUNCTION(BlueprintCallable, Category = Interaction)
+	void SetInteract(bool bNewInteract);
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
+	bool GetInteract();
+
+	UFUNCTION(BlueprintCallable, Category = Interaction)
 	void SetSwitchMode(bool bNewSwitchMode);
 
 	UFUNCTION(BlueprintCallable, Category = Interaction)
@@ -163,6 +172,8 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 	void RotateObjectByMouse();
+
+	void InteractMouseMovement();
 
 protected:
 	// APawn interface

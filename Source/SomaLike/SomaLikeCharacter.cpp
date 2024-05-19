@@ -129,7 +129,7 @@ void ASomaLikeCharacter::Look(const FInputActionValue& Value)
 
 void ASomaLikeCharacter::StartInteract(const FInputActionValue& Value)
 {
-	if(!bIsInteracting | !bIsInspect && !GetInteractable())
+	if(!bIsInteracting | !bIsInspect | !bIsInteract && !GetInteractable())
 	{
 		// Line trace to interact with objects
 		FVector Start = FirstPersonCameraComponent->GetComponentLocation();
@@ -156,6 +156,10 @@ void ASomaLikeCharacter::StartInteract(const FInputActionValue& Value)
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Dropping"));
 			Drop(Value);
 		}
+		else
+		{
+			Drop(Value);
+		}
 	}
 }
 
@@ -170,7 +174,7 @@ void ASomaLikeCharacter::TriggeredInteract(const FInputActionValue& Value)
 
 void ASomaLikeCharacter::Drop(const FInputActionValue& Value)
 {
-	if(bIsInteracting | bIsInspect && GetInteractable())
+	if(bIsInteracting | bIsInspect | bIsInteract && GetInteractable())
 	{
 		if(IInteractionSystem* Interface = Cast<IInteractionSystem>(GetInteractable()))
 		{
@@ -196,7 +200,7 @@ void ASomaLikeCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if(bIsInteracting | bIsInspect && GetInteractable())
+	if(bIsInteracting | bIsInspect | bIsInteract && GetInteractable())
 	{
 		if(PhysicsHandle->GrabbedComponent)
 		{
@@ -206,12 +210,17 @@ void ASomaLikeCharacter::Tick(float DeltaSeconds)
 			PhysicsHandle->SetTargetLocation(End);
 
 			// Set rotation of grabbed object to match the camera rotation
-			if (!bIsInspect) PhysicsHandle->SetTargetRotation(FirstPersonCameraComponent->GetComponentRotation());
+			if (!bIsInspect && !bIsInteract) PhysicsHandle->SetTargetRotation(FirstPersonCameraComponent->GetComponentRotation());
 		}
 		
 		if(bIsInspect)
 		{
 			RotateObjectByMouse();
+		}
+
+		if(bIsInteract)
+		{
+			InteractMouseMovement();
 		}
 	}
 }
@@ -225,10 +234,23 @@ void ASomaLikeCharacter::RotateObjectByMouse()
 		float LocalMouseY = 0.f;
 		GetWorld()->GetFirstPlayerController()->GetInputMouseDelta(LocalMouseX, LocalMouseY);
 		FRotator NewRotation = FRotator(0.f, LocalMouseX, LocalMouseY);
+		LastMouseXPos = LocalMouseX;
+		LastMouseYPos = LocalMouseY;
 
 		if(GetInteractable()->GetActorRotation() == NewRotation) return;
 		
 		GetInteractable()->AddActorLocalRotation(NewRotation);
+	}
+}
+
+void ASomaLikeCharacter::InteractMouseMovement()
+{
+	if(bIsInteract && GetInteractable())
+	{
+		if(IInteractionSystem* Interface = Cast<IInteractionSystem>(GetInteractable()))
+		{
+			Interface->OnUse(this);
+		}
 	}
 }
 
@@ -270,6 +292,16 @@ void ASomaLikeCharacter::SetInspect(bool bNewInspect)
 bool ASomaLikeCharacter::GetInspect()
 {
 	return bIsInspect;
+}
+
+void ASomaLikeCharacter::SetInteract(bool bNewInteract)
+{
+	bIsInteract = bNewInteract;
+}
+
+bool ASomaLikeCharacter::GetInteract()
+{
+	return bIsInteract;
 }
 
 void ASomaLikeCharacter::SetSwitchMode(bool bNewSwitchMode)
