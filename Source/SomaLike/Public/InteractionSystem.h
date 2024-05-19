@@ -29,4 +29,6 @@ public:
 	virtual void OnEquip(ASomaLikeCharacter* Character);
 
 	virtual void OnSwitchMode(ASomaLikeCharacter* Character);
+
+	virtual void OnResetPosition();
 };

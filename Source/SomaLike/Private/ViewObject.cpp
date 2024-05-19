@@ -11,7 +11,6 @@ AViewObject::AViewObject()
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComponent"));
 	SetRootComponent(MeshComponent);
-	MeshComponent->SetSimulatePhysics(true);
 	MeshComponent->SetCollisionProfileName(TEXT("PhysicsActor"));
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	MeshComponent->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
@@ -36,6 +35,8 @@ void AViewObject::Tick(float DeltaTime)
 void AViewObject::OnInspect(ASomaLikeCharacter* Character)
 {
 	IInteractionSystem::OnInspect(Character);
+
+	MeshComponent->SetSimulatePhysics(true);
 
 	UPhysicsHandleComponent* PhysicsHandle = Character->GetPhysicsHandle();
 	
@@ -74,7 +75,7 @@ void AViewObject::OnDrop(ASomaLikeCharacter* Character)
 
 	MeshComponent->SetAngularDamping(0.0f);
 	
-	ForceSetSimulatePhysicsMesh(true);
+	//ForceSetSimulatePhysicsMesh(true);
 
 	Character->SetInteractable(nullptr);
 

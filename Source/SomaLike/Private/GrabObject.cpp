@@ -21,7 +21,9 @@ AGrabObject::AGrabObject()
 void AGrabObject::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	InitialRotation = GetActorRotation();
+	InitialLocation = GetActorLocation();
 }
 
 // Called every frame
@@ -99,5 +101,13 @@ void AGrabObject::OnSwitchMode(ASomaLikeCharacter* Character)
 		PhysicsHandle->GrabComponentAtLocationWithRotation(MeshComponent, NAME_None, MeshComponent->GetComponentLocation(), MeshComponent->GetComponentRotation());
 	
 	}
+}
+
+void AGrabObject::OnResetPosition()
+{
+	IInteractionSystem::OnResetPosition();
+
+	SetActorLocation(InitialLocation);
+	SetActorRotation(InitialRotation);
 }
 

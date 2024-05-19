@@ -17,6 +17,9 @@ class SOMALIKE_API AGrabObject : public AActor, public IInteractionSystem
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	bool bIsGrab = false;
+
+	FRotator InitialRotation;
+	FVector InitialLocation;
 	
 public:	
 	// Sets default values for this actor's properties
@@ -35,6 +38,8 @@ public:
 	virtual void OnDrop(ASomaLikeCharacter* Character) override;
 
 	virtual void OnSwitchMode(ASomaLikeCharacter* Character) override;
+
+	virtual void OnResetPosition() override;
 
 	UFUNCTION()
 	bool GetIsGrab() const { return bIsGrab; }

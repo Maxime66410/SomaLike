@@ -26,3 +26,7 @@ void IInteractionSystem::OnEquip(ASomaLikeCharacter* Character)
 void IInteractionSystem::OnSwitchMode(ASomaLikeCharacter* Character)
 {
 }
+
+void IInteractionSystem::OnResetPosition()
+{
+}
