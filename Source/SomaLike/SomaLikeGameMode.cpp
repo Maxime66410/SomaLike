@@ -7,8 +7,8 @@
 ASomaLikeGameMode::ASomaLikeGameMode()
 	: Super()
 {
-	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Assets/Blueprint/Player/BP_FirstPersonCharacter.BP_FirstPersonCharacter"));
+	// set default pawn class to our Blueprinted character -> All / Content / Assets / Blueprint / Player / BP_FirstPersonCharacter
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/Assets/Blueprint/Player/BP_FirstPersonCharacter"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
 }
