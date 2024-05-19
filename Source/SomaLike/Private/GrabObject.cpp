@@ -109,5 +109,8 @@ void AGrabObject::OnResetPosition()
 
 	SetActorLocation(InitialLocation);
 	SetActorRotation(InitialRotation);
+
+	MeshComponent->SetPhysicsLinearVelocity(FVector::ZeroVector);
+	MeshComponent->SetPhysicsAngularVelocityInDegrees(FVector::ZeroVector);
 }
 
