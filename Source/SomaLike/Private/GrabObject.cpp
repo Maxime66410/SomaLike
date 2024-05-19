@@ -15,6 +15,8 @@ AGrabObject::AGrabObject()
 	MeshComponent->SetCollisionProfileName(TEXT("PhysicsActor"));
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	MeshComponent->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
+	
+	Tags.Add(FName("Grabable"));
 }
 
 // Called when the game starts or when spawned

@@ -94,6 +94,50 @@ void ASomaLikeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	}
 }
 
+void ASomaLikeCharacter::UpdatedHUB()
+{
+	if(!bIsInspect & !bIsInteract & !bIsInteracting)
+	{
+		FVector Start = FirstPersonCameraComponent->GetComponentLocation();
+		FVector End = Start + FirstPersonCameraComponent->GetForwardVector() * 200.f;
+		FHitResult Hit;
+		FCollisionQueryParams TraceParams;
+		TraceParams.AddIgnoredActor(this);
+		GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECollisionChannel::ECC_Visibility, TraceParams);
+		if (Hit.bBlockingHit)
+		{
+			if(Hit.GetActor())
+			{
+				if(Hit.GetActor()->Tags.Num() <= 0) return;
+		
+				FString Tag = Hit.GetActor()->Tags[0].ToString();
+
+				if(Tag == "Interactable") CallHUDInteractionType(InteractType::Interact);
+				else if(Tag == "Inspectable") CallHUDInteractionType(InteractType::Inspect);
+				else if(Tag == "Grabable") CallHUDInteractionType(InteractType::Grab);
+				else if(Tag == "Pickupable") CallHUDInteractionType(InteractType::Pickup);
+				else CallHUDInteractionType(InteractType::None);
+			}
+			else
+			{
+				CallHUDInteractionType(InteractType::None);
+			}
+		}
+		else
+		{
+			CallHUDInteractionType(InteractType::None);
+		}
+	}
+	else
+	{
+		CallHUDInteractionType(InteractType::None);
+	}
+}
+
+void ASomaLikeCharacter::CallHUDInteractionType_Implementation(InteractType Type)
+{
+}
+
 
 void ASomaLikeCharacter::Move(const FInputActionValue& Value)
 {
@@ -223,6 +267,8 @@ void ASomaLikeCharacter::Tick(float DeltaSeconds)
 			InteractMouseMovement();
 		}
 	}
+
+	UpdatedHUB();
 }
 
 void ASomaLikeCharacter::RotateObjectByMouse()

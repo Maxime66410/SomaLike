@@ -25,6 +25,8 @@ AClosetDoorSystem::AClosetDoorSystem()
 	PhysicsConstraintComponent = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("PhysicsConstraintComponent"));
 	PhysicsConstraintComponent->SetupAttachment(Root);
 	PhysicsConstraintComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
+
+	Tags.Add(FName("Interactable"));
 }
 
 // Called when the game starts or when spawned

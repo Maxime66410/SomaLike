@@ -14,6 +14,8 @@ AViewObject::AViewObject()
 	MeshComponent->SetCollisionProfileName(TEXT("PhysicsActor"));
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	MeshComponent->SetCollisionObjectType(ECollisionChannel::ECC_PhysicsBody);
+
+	Tags.Add(FName("Inspectable"));
 }
 
 // Called when the game starts or when spawned

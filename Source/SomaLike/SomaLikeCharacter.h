@@ -17,6 +17,16 @@ struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
+UENUM(BlueprintType)
+enum class InteractType : uint8
+{
+	None,
+	Pickup,
+	Inspect,
+	Interact,
+	Grab
+};
+
 UCLASS(config=Game)
 class ASomaLikeCharacter : public ACharacter
 {
@@ -185,5 +195,10 @@ public:
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+
+	UFUNCTION(BlueprintNativeEvent, Category = "Interaction")
+	void CallHUDInteractionType(InteractType Type);
+
+	void UpdatedHUB();
 };
 
