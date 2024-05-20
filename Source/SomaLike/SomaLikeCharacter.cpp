@@ -24,12 +24,17 @@ ASomaLikeCharacter::ASomaLikeCharacter()
 	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
+
+	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
+	SpringArm->SetupAttachment(GetCapsuleComponent());
+	SpringArm->SetRelativeLocation(FVector(0.f, 0.f, 60.f)); // Position the camera
+	SpringArm->bUsePawnControlRotation = true;
+	SpringArm->TargetArmLength = 0.0f;
 		
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
-	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+	FirstPersonCameraComponent->SetupAttachment(SpringArm);
+	
 
 	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
@@ -248,7 +253,7 @@ void ASomaLikeCharacter::Tick(float DeltaSeconds)
 	{
 		if(PhysicsHandle->GrabbedComponent)
 		{
-			float localDistance = bIsInspect ? 150.0f : 300.0f;
+			float localDistance = bIsInspect ? 60.0f : 100.0f;
 			FVector Start = Mesh1P->GetSocketLocation("head");
 			FVector End = Start + (FirstPersonCameraComponent->GetForwardVector() * localDistance);
 			PhysicsHandle->SetTargetLocation(End);

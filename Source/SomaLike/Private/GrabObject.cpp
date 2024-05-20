@@ -89,7 +89,7 @@ void AGrabObject::OnSwitchMode(ASomaLikeCharacter* Character)
 
 		MeshComponent->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
 		
-		MeshComponent->SetAngularDamping(100000.0f);
+		MeshComponent->SetAngularDamping(1000000000.0f);
 	}
 	else
 	{
